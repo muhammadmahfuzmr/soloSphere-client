@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import logo from "../../assets/images/logo.png";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 const NavBar = () => {
   const { user ,logOut } = useContext(AuthContext);
  
@@ -45,7 +45,7 @@ const NavBar = () => {
               className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <div className="justify-between">Add Job</div>
+                <NavLink to='/addjob' className="justify-between">Add Job</NavLink>
               </li>
               <li>
                 <div>My Posted Jobs</div>
