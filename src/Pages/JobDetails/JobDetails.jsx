@@ -4,6 +4,8 @@ import { AuthContext } from "../../AuthProvider/AuthProvider"
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const JobDetails = () => {
     const {user} = useContext(AuthContext)
@@ -12,16 +14,24 @@ const JobDetails = () => {
     
     const {category,  deadline , description, job_title, max_price, min_price, buyer_email, _id, } =job
     const handleBidSubmit = async e =>{
+        if(user?.email === buyer_email) return toast.error("Action is not Permited")
         e.preventDefault()
         const form = e.target;
         const price = parseFloat(form.price.value);
+        if(price < parseFloat(min_price)) return toast.error("Price must be equal or more than minimum price")
         const email = user?.email;
         const comment = form.comment.value;
         const jobId = _id
         const deadline = startDate
         const status = "Pending"
         const bidData = {price, email, comment, category, job_title, buyer_email, jobId, status, deadline}
-        console.table(bidData)
+       
+        try{
+            const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/bid`, bidData)
+            console.log(data)
+        } catch(err){
+            console.error(err.message)
+        }
     }
     return (
       <div className='flex flex-col md:flex-row justify-around gap-5  items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto '>
