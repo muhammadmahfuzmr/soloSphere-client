@@ -1,5 +1,28 @@
+import { useContext, useState } from "react"
+import { useLoaderData } from "react-router-dom"
+import { AuthContext } from "../../AuthProvider/AuthProvider"
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+
 const JobDetails = () => {
-    const {category,  deadline , description, job_title, max_price, min_price} =job
+    const {user} = useContext(AuthContext)
+    const job = useLoaderData()
+    const [startDate, setStartDate] = useState(new Date());
+    
+    const {category,  deadline , description, job_title, max_price, min_price, buyer_email, _id, } =job
+    const handleBidSubmit = async e =>{
+        e.preventDefault()
+        const form = e.target;
+        const price = parseFloat(form.price.value);
+        const email = user?.email;
+        const comment = form.comment.value;
+        const jobId = _id
+        const deadline = startDate
+        const status = "Pending"
+        const bidData = {price, email, comment, category, job_title, buyer_email, jobId, status, deadline}
+        console.table(bidData)
+    }
     return (
       <div className='flex flex-col md:flex-row justify-around gap-5  items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto '>
         {/* Job Details */}
@@ -26,9 +49,9 @@ const JobDetails = () => {
             </p>
             <div className='flex items-center gap-5'>
               <div>
-                <p className='mt-2 text-sm  text-gray-600 '>Name: Jhankar Vai.</p>
+                <p className='mt-2 text-sm  text-gray-600 '>Name: </p>
                 <p className='mt-2 text-sm  text-gray-600 '>
-                  Email: jhankar@mahbub.com
+                  Email: {buyer_email}
                 </p>
               </div>
               <div className='rounded-full object-cover overflow-hidden w-14 h-14'>
@@ -46,7 +69,7 @@ const JobDetails = () => {
             Place A Bid
           </h2>
   
-          <form>
+          <form onSubmit={handleBidSubmit}>
             <div className='grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2'>
               <div>
                 <label className='text-gray-700 ' htmlFor='price'>
@@ -68,7 +91,8 @@ const JobDetails = () => {
                   id='emailAddress'
                   type='email'
                   name='email'
-                  disabled
+                  defaultValue={user?.email}
+                  readOnly
                   className='block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md   focus:border-blue-400 focus:ring-blue-300 focus:ring-opacity-40  focus:outline-none focus:ring'
                 />
               </div>
@@ -86,7 +110,7 @@ const JobDetails = () => {
               </div>
               <div className='flex flex-col gap-2 '>
                 <label className='text-gray-700'>Deadline</label>
-  
+                <DatePicker className="border p-2 rounded-md w-full" selected={startDate} onChange={(date) => setStartDate(date)} />
                 {/* Date Picker Input Field */}
               </div>
             </div>
