@@ -1,22 +1,33 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import img from "../../assets/images/register.jpg";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
+import axios from "axios";
 const Registration = () => {
   const navigate = useNavigate();
+  const location =  useLocation()
+  const from = location.state || '/'
   const {
     signInWithGoogle,
     updateUserProfile,
     createUser,
     user,
-    setUser
+    setUser,
+    loading
   } = useContext(AuthContext);
+  useEffect(()=>{
+    if(user){
+      navigate('/')
+    }
+  },[navigate, user])
   const handleGoogleSignIN = async () => {
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {email: result?.user?.email}, {withCredentials: true})
+      console.log(data)
       toast.success("Signin Successfully");
-      navigate("/");
+      navigate(from);
     } catch (err) {
       console.error(err);
       toast.error(err?.message);
@@ -34,9 +45,12 @@ const Registration = () => {
       const result = await createUser(email, password)
       console.log(result)
       await updateUserProfile (name , photo)
-      setUser({...user, photoURL: photo , displayName: name})
+      setUser({...result?.user, photoURL: photo , displayName: name})
       
-      navigate('/')
+     
+      const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {email: result?.user?.email}, {withCredentials: true})
+      console.log(data)
+      navigate(from, {replace: true})
       toast.success("Successfully Registered")
       form.reset()
     } catch(err){
@@ -44,6 +58,7 @@ const Registration = () => {
       toast.error(err?.message)
     }
   };
+  if(user || loading) return
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-306px)]">
       <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg gap-10 lg:max-w-4xl ">

@@ -1,16 +1,30 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import BgImg from "../../assets/images/login.jpg";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
 import toast from "react-hot-toast";
+import axios from "axios";
 const Login = () => {
   const navigate = useNavigate();
-  const { signIn, signInWithGoogle } = useContext(AuthContext);
+  const location = useLocation()
+  const from = location.state || '/'
+  const { signIn, signInWithGoogle, user, loading } = useContext(AuthContext);
+  useEffect(()=>{
+    if(user){
+      navigate('/')
+    }
+  },[navigate, user])
   const handleGoogleSignIN = async () => {
     try {
-      await signInWithGoogle();
-      toast.success("Signin Successfully");
-      navigate("/");
+       const result = await signInWithGoogle();
+       const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {email: result?.user?.email}, {withCredentials: true})
+      console.log(data)
+      console.log(result)
+       toast.success("Signin Successfully");
+      
+        navigate(from, {replace:true});
+      
+      
     } catch (err) {
       console.error(err);
       toast.error(err?.message);
@@ -24,14 +38,20 @@ const Login = () => {
     const email = form.email.value;
     try{
       const result = await signIn(email, password)
-      console.log(result)
-      navigate('/')
+      const {data} = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {email: result?.user?.email}, {withCredentials: true})
+      console.log(data)
+    
+        navigate(from , {replace: true});
+       
+     
+     console.log(result)
       toast.success("successfully Login")
     }catch(err){
       console.log(err?.message)
       toast.error(err?.message)
     }
   }
+  if(user || loading) return
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-306px)]">
       <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg gap-10  lg:max-w-4xl ">

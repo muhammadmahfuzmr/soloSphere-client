@@ -48,13 +48,13 @@ const NavBar = () => {
                 <NavLink to='/addjob' className="justify-between">Add Job</NavLink>
               </li>
               <li>
-                <div>My Posted Jobs</div>
+                <NavLink to='/mypost'>My Posted Jobs</NavLink>
               </li>
               <li>
-                <div>My Bids</div>
+                <Link to='/mybids'>My Bids</Link>
               </li>
               <li>
-                <div>Bid Requests</div>
+                <Link to='/bidrequests'>Bid Requests</Link>
               </li>
               <li className="mt-2">
                 <button onClick={logOut} className="bg-gray-200 block text-center">
